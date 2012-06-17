@@ -4,3 +4,4 @@ C:\Users\Thom\documents\visual studio 2010\Projects\fitreader\SimpleFitreader\ob
 C:\Users\Thom\documents\visual studio 2010\Projects\fitreader\SimpleFitreader\obj\x86\Debug\SimpleFitreader.pdb
 C:\Users\Thom\documents\visual studio 2010\Projects\fitreader\SimpleFitreader\obj\x86\Debug\SimpleFitreader.csprojResolveAssemblyReference.cache
 C:\Users\Thom\Documents\Visual Studio 2010\Projects\fitReader\SimpleFitreader\bin\Debug\SimpleFitreader.exe.config
+C:\Users\Thom\documents\visual studio 2010\Projects\fitreader\SimpleFitreader\bin\Debug\fitRepair.exe.config

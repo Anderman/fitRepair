@@ -4,4 +4,7 @@
     <StartArguments>c:\temp\2012-06-02-06-34-53.csv</StartArguments>
     <StartWorkingDirectory>c:\temp</StartWorkingDirectory>
   </PropertyGroup>
+  <PropertyGroup>
+    <ProjectView>ShowAllFiles</ProjectView>
+  </PropertyGroup>
 </Project>
