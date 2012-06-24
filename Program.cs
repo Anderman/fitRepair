@@ -18,10 +18,10 @@ namespace myFit
             if (args.Length > 0)
             {
                 string filename = args[0];
-                if (filename.EndsWith(".fit"))
+                if (filename.ToLower().EndsWith(".fit"))
                 {
                     FileStream file = (new FileStream(filename, FileMode.Open));
-                    StreamWriter outFile = (new StreamWriter(filename.Replace(".fit", ".csv"), false));
+                    StreamWriter outFile = (new StreamWriter(filename.ToLower().Replace(".fit", ".csv"), false));
                     new fitFileReader(file, outFile);
                     file.Close();
                     outFile.Close();
@@ -29,7 +29,7 @@ namespace myFit
                 else
                 {
                     StreamReader file = (new StreamReader(filename));
-                    FileStream outFile = (new FileStream(filename.Replace(".csv", "_fixed.fit"), FileMode.Create));
+                    FileStream outFile = (new FileStream(filename.ToLower().Replace(".csv", "_fixed.fit"), FileMode.Create));
                     new fitFileWrite(file, outFile);
                     file.Close();
                     outFile.Close();

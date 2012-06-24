@@ -35,7 +35,8 @@ namespace myFit
             int RecordsOk = 5;
             localMsgDef[] localMesgDefs = new localMsgDef[16];
             FitRecord record = new FitRecord(file);
-            long pos = file.Position = 12;
+
+            long pos = file.Position = (byte)file.ReadByte() == 14 ? 14 : 12;
             UInt32 TraveltotalSeconds = 0;
             UInt32 TravelStartTimestamp = 0;
             UInt32 TravelEndTimestamp = 0;
@@ -86,7 +87,7 @@ namespace myFit
                             TravelStartTimestamp = TravelEndTimestamp = 0;
                             TravelStartMeters = TravelEndMeters = 0;
                         }
-                        if (record.localMsgDef.globalMesgIndex == FIT.FIT_MESG_NUM_RECORD && record.power > 0 && record.power!=0xFFFF)
+                        if (record.localMsgDef.globalMesgIndex == FIT.FIT_MESG_NUM_RECORD && record.power > 0 && record.power != 0xFFFF)
                         {
                             PowerEndTimestamp = record.timestamp;
                             totPower += record.power;
@@ -106,26 +107,26 @@ namespace myFit
                 catch (IOException e) { break; }
                 catch (Exception ex) { Console.WriteLine(ex.Message); ; }
             }
-            closeSession(outFile, localMesgDefs);
+            closeSession(outFile, localMesgDefs, TravelEndTimestamp);
             if (ErrorBytes != "") outFile.WriteLine(ErrorBytes);
-            outFile.WriteLine(String.Format("Tijd: {0}, Afstand: {1}, Snelheid: {2}. Gem Vermogen: {3}, Calorien: {4}", new TimeSpan(0, 0, (int)TraveltotalSeconds), (TraveltotalMeters / 100000.0).ToString("0.00"), ((TraveltotalMeters / 100000.0) / (TraveltotalSeconds / 3600.0)).ToString("0.0"), totPower / PowertotalSeconds, totPower / 1000.0 * 1.1));
+            outFile.WriteLine(String.Format("Tijd: {0}, Afstand: {1}, Snelheid: {2}. Gem Vermogen: {3}, Calorien: {4}", new TimeSpan(0, 0, (int)TraveltotalSeconds), (TraveltotalMeters / 100000.0).ToString("0.00"), ((TraveltotalMeters / 100000.0) / (TraveltotalSeconds / 3600.0)).ToString("0.0"), PowertotalSeconds == 0 ? 0 : totPower / PowertotalSeconds, totPower / 1000.0 * 1.1));
         }
-        private void closeSession(StreamWriter outFile, localMsgDef[] localMsgDefs)//, DateTime dt, UInt32 start_position_lat, UInt32 start_position_long, UInt32 total_elapsed_time, UInt32 total_timer_time, UInt32 total_distance, UInt32 total_calories, UInt32 avg_speed, UInt32 max_speed, UInt32 avg_power, UInt32 max_power, UInt32 total_ascent, UInt32 total_descent, UInt32 avg_heart_rate, UInt32 max_heart_rate, UInt32 avg_cadence, UInt32 max_cadence)
+        private void closeSession(StreamWriter outFile, localMsgDef[] localMsgDefs, UInt32 TravelEndTimestamp)//, DateTime dt, UInt32 start_position_lat, UInt32 start_position_long, UInt32 total_elapsed_time, UInt32 total_timer_time, UInt32 total_distance, UInt32 total_calories, UInt32 avg_speed, UInt32 max_speed, UInt32 avg_power, UInt32 max_power, UInt32 total_ascent, UInt32 total_descent, UInt32 avg_heart_rate, UInt32 max_heart_rate, UInt32 avg_cadence, UInt32 max_cadence)
         {
             int _event = 0;
             int i = 0;
-            for (i=0;i<16;i++)
+            for (i = 0; i < 16; i++)
             {
 
                 if (localMsgDefs[i] == null) break;
                 if (localMsgDefs[i].globalMesgIndex == FIT.FIT_MESG_NUM_EVENT) _event = i;
                 if (localMsgDefs[i].globalMesgIndex == FIT.FIT_MESG_NUM_SESSION) return;
             }
-            outFile.WriteLine(string.Format("def;{0};0;0;18;31;253;4;134;2;4;134;3;4;133;4;4;133;7;4;134;8;4;134;9;4;134;10;4;134;29;4;133;30;4;133;31;4;133;32;4;133;254;2;132;11;2;132;13;2;132;14;2;132;15;2;132;20;2;132;21;2;132;22;2;132;23;2;132;25;2;132;26;2;132;0;1;0;1;1;0;5;1;0;6;1;0;16;1;2;17;1;2;18;1;2;19;1;2;;;", i + 64));
-            outFile.WriteLine(string.Format("data;{0};16-6-2012 17:19;708788214;627355257;56710458;6176,85;5831,27;52979,47;;;;;;0;997;;9,085;13,627;231;712;137;133;0;53;SESSION;STOP;CYCLING;255;154;180;76;116;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;",i));
-            outFile.WriteLine(string.Format("data;{0};16-6-2012 17:19;1;SESSION;STOP_DISABLE_ALL;1;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;", _event));
-            outFile.WriteLine(string.Format("def;{0};0;0;34;6;253;4;134;0;4;134;1;2;132;2;1;0;3;1;0;4;1;0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;", i+1 + 64));
-            outFile.WriteLine(string.Format("data;{0};16-6-2012 17:19;5831,27;1;0;ACTIVITY;STOP;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;", i+1));
+            outFile.WriteLine(string.Format("def;{0};0;0;18;31;253;4;134;2;4;134;3;4;133;4;4;133;7;4;134;8;4;134;9;4;134;10;4;134;29;4;133;30;4;133;31;4;133;32;4;133;254;2;132;11;2;132;13;2;132;14;2;132;15;2;132;20;2;132;21;2;132;22;2;132;23;2;132;25;2;132;26;2;132;0;1;0;1;1;0;5;1;0;6;1;0;16;1;2;17;1;2;18;1;2;19;1;2", i + 64));
+            outFile.WriteLine(string.Format("data;{0};{1};708788214;627355257;56710458;6176,85;5831,27;52979,47;;;;;;0;997;;9,085;13,627;231;712;137;133;0;53;SESSION;STOP;CYCLING;255;154;180;76;116", i, FIT.timestampToLocalTime(TravelEndTimestamp)));
+            outFile.WriteLine(string.Format("data;{0};{1};1;SESSION;STOP_DISABLE_ALL;1", _event, FIT.timestampToLocalTime(TravelEndTimestamp)));
+            outFile.WriteLine(string.Format("def;{0};0;0;34;6;253;4;134;0;4;134;1;2;132;2;1;0;3;1;0;4;1;0", i + 1 + 64));
+            outFile.WriteLine(string.Format("data;{0};{1};5831,27;1;0;ACTIVITY;STOP", i + 1, FIT.timestampToLocalTime(TravelEndTimestamp)));
         }
         private void readFileHeader(FileStream file)
         {
@@ -245,7 +246,7 @@ namespace myFit
                         }
                     }
 
-                    if (globalField.name == "timestamp") str = FIT.dt1989.AddSeconds(UInt32.Parse(str)).ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss");
+                    if (globalField.name == "timestamp") str = FIT.timestampToLocalTime(UInt32.Parse(str));
                     recordString += ";" + str;
                     switch (globalField.name)
                     {
@@ -278,7 +279,7 @@ namespace myFit
                 msgDef.mesg = FIT.getMessageStruct(msgDef.globalMesgIndex);
 
                 msgDef.Fields = file.readbyte();
-                if (msgDef.Fields > msgDef.mesg.fields.Length) return "";
+                if (msgDef.Fields > msgDef.mesg.fields.Length + 10) return "";
 
                 recordString += (string.Format(";{0};{1};{2};{3}", msgDef.reserved, msgDef.Architecture, msgDef.globalMesgIndex, msgDef.Fields));
                 recordDefinitionHeader = ";;reserved;Architecture;globalMesgIndex;Fields";

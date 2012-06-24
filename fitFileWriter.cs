@@ -9,7 +9,6 @@ namespace myFit
 {
     public class statistics
     {
-        DateTime dt;
         public Int32 start_position_lat;
         public Int32 start_position_long;
         public UInt32 total_elapsed_time;
@@ -20,8 +19,6 @@ namespace myFit
         public UInt16 max_speed;
         public UInt16 avg_power;
         public UInt16 max_power;
-        public UInt16 total_ascent;
-        public UInt16 total_descent;
         public byte avg_heart_rate;
         public byte max_heart_rate;
         public byte avg_cadence;
@@ -36,111 +33,237 @@ namespace myFit
         public byte cadence = 0;
 
         UInt16 lastAltitude = 0xFFFF;
-        UInt32 startTimestamp = 0;
-        UInt32 TraveltotalSeconds = 0;
-        UInt32 TravelStartTimestamp = 0;
-        UInt32 TravelEndTimestamp = 0;
-        UInt32 TraveltotalCentimeters = 0;
-        UInt32 TravelStartMeters = 0;
-        UInt32 TravelEndMeters = 0;
-        UInt32 totPower = 0;
-        UInt32 PowertotalSeconds = 0;
-        UInt32 PowerStartTimestamp = 0;
-        UInt32 PowerEndTimestamp = 0;
-        UInt32 totheart_rate = 0;
-        UInt32 heart_ratetotalSeconds = 0;
-        UInt32 heart_rateStartTimestamp = 0;
-        UInt32 heart_rateEndTimestamp = 0;
-        UInt32 totcadence = 0;
-        UInt32 cadencetotalSeconds = 0;
-        UInt32 cadenceStartTimestamp = 0;
-        UInt32 cadenceEndTimestamp = 0;
+        UInt32 lastTimestamp = 0;
+        UInt32 lastTravelCM = 0;
+
+        public UInt16 SessionTotal_ascent;
+        public UInt16 SessionTotal_descent;
+        public UInt32 SessionStartTimestamp = 0XFFFFFFFF;
+        UInt32 SessionTravelTotSeconds = 0;
+        UInt32 SessionTravelStartTimestamp = 0;
+        UInt32 SessionTravelTotcm = 0;
+        UInt32 SessionTravelStartCM = 0;
+        UInt32 SessionPowerTot = 0;
+        UInt32 SessionPowerTotSeconds = 0;
+        UInt32 SessionPowerStartTimestamp = 0;
+        UInt32 SessionHeart_rateTot = 0;
+        UInt32 SessionHeart_rateTotSeconds = 0;
+        UInt32 SessionHeart_rateStartTimestamp = 0;
+        UInt32 SessionCadenceTot = 0;
+        UInt32 SessionCadenceTotSeconds = 0;
+        UInt32 SessionCadenceStartTimestamp = 0;
+        bool SessionEnd = false;
+
+        public UInt16 LapTotal_ascent;
+        public UInt16 LapTotal_descent;
+        public UInt32 LapStartTimestamp = 0XFFFFFFFF;
+        UInt32 LapTravelTotSeconds = 0;
+        UInt32 LapTravelStartTimestamp = 0;
+        UInt32 LapTravelTotcm = 0;
+        UInt32 LapTravelStartCM = 0;
+        UInt32 LapPowerTot = 0;
+        UInt32 LapPowerTotSeconds = 0;
+        UInt32 LapPowerStartTimestamp = 0;
+        UInt32 LapHeart_rateTot = 0;
+        UInt32 LapHeart_rateTotSeconds = 0;
+        UInt32 LapHeart_rateStartTimestamp = 0;
+        UInt32 LapCadenceTot = 0;
+        UInt32 LapCadenceTotSeconds = 0;
+        UInt32 LapCadenceStartTimestamp = 0;
+        bool LapEnd = false;
+
         public void calcSession()
         {
-            total_elapsed_time = (UInt32)((timestamp - startTimestamp) * 1000);
-            total_timer_time = (UInt32)(TraveltotalSeconds * 1000);
+            SessionEnd = true;
+            update();
+            SessionEnd = false;
+            total_elapsed_time = (UInt32)((timestamp - SessionStartTimestamp) * 1000);
+            total_timer_time = (UInt32)(SessionTravelTotSeconds * 1000);
             total_distance = distance;
-            total_calories = (UInt16)(totPower / 1000.0 * 1.1 + 0.1);
-            avg_speed = (UInt16)((TraveltotalCentimeters * 10.0) / (TraveltotalSeconds));
-            avg_power = PowertotalSeconds == 0 ? (UInt16)0xFFFF : (UInt16)(totPower / PowertotalSeconds);
-            avg_heart_rate = heart_ratetotalSeconds == 0 ? (byte)0xFF : (byte)(totheart_rate / heart_ratetotalSeconds);
-            avg_cadence = cadencetotalSeconds == 0 ? (byte)0xFF : (byte)(totcadence / cadencetotalSeconds);
+            total_calories = (UInt16)(SessionPowerTot / 1000.0 * 1.1 + 0.1);
+            avg_speed = (UInt16)((SessionTravelTotcm * 10.0) / (SessionTravelTotSeconds));
+            avg_power = SessionPowerTotSeconds == 0 ? (UInt16)0xFFFF : (UInt16)(SessionPowerTot / SessionPowerTotSeconds);
+            avg_heart_rate = SessionHeart_rateTotSeconds == 0 ? (byte)0xFF : (byte)(SessionHeart_rateTot / SessionHeart_rateTotSeconds);
+            avg_cadence = SessionCadenceTotSeconds == 0 ? (byte)0xFF : (byte)(SessionCadenceTot / SessionCadenceTotSeconds);
+        }
+        public void resetSession()
+        {
+            SessionTotal_ascent = 0;
+            SessionTotal_descent = 0;
+            SessionStartTimestamp = 0xFFFFFFFF;
+            SessionTravelTotSeconds = 0;
+            SessionTravelStartTimestamp = 0;
+            SessionTravelTotcm = 0;
+            SessionTravelStartCM = 0;
+            SessionPowerTot = 0;
+            SessionPowerTotSeconds = 0;
+            SessionPowerStartTimestamp = 0;
+            SessionHeart_rateTot = 0;
+            SessionHeart_rateTotSeconds = 0;
+            SessionHeart_rateStartTimestamp = 0;
+            SessionCadenceTot = 0;
+            SessionCadenceTotSeconds = 0;
+            SessionCadenceStartTimestamp = 0;
+        }
+        public void calcLap()
+        {
+            LapEnd = true;
+            update();
+            LapEnd = false;
+
+            total_elapsed_time = (UInt32)((timestamp - LapStartTimestamp) * 1000);
+            total_timer_time = (UInt32)(LapTravelTotSeconds * 1000);
+            total_distance = LapTravelTotcm;
+            total_calories = (UInt16)(LapPowerTot / 1000.0 * 1.1 + 0.1);
+            avg_speed = (UInt16)((LapTravelTotcm * 10.0) / (LapTravelTotSeconds));
+            avg_power = LapPowerTotSeconds == 0 ? (UInt16)0xFFFF : (UInt16)(LapPowerTot / LapPowerTotSeconds);
+            avg_heart_rate = LapHeart_rateTotSeconds == 0 ? (byte)0xFF : (byte)(LapHeart_rateTot / LapHeart_rateTotSeconds);
+            avg_cadence = LapCadenceTotSeconds == 0 ? (byte)0xFF : (byte)(LapCadenceTot / LapCadenceTotSeconds);
+
+        }
+        public void resetLap()
+        {
+            LapTotal_ascent = 0;
+            LapTotal_descent = 0;
+            LapStartTimestamp = 0xFFFFFFFF;
+            LapTravelTotSeconds = 0;
+            LapTravelStartTimestamp = 0;
+            LapTravelTotcm = 0;
+            LapTravelStartCM = 0;
+            LapPowerTot = 0;
+            LapPowerTotSeconds = 0;
+            LapPowerStartTimestamp = 0;
+            LapHeart_rateTot = 0;
+            LapHeart_rateTotSeconds = 0;
+            LapHeart_rateStartTimestamp = 0;
+            LapCadenceTot = 0;
+            LapCadenceTotSeconds = 0;
+            LapCadenceStartTimestamp = 0;
         }
         public void update()
         {
+            if (SessionStartTimestamp == 0xFFFFFFFF) SessionStartTimestamp = timestamp;
+            if (LapStartTimestamp == 0xFFFFFFFF) LapStartTimestamp = timestamp;
             if (lastAltitude == 0xFFFF) lastAltitude = altitude;
-            if (altitude - lastAltitude > 0) total_ascent += (UInt16)(altitude - lastAltitude);
-            if (lastAltitude - altitude > 0) total_descent += (UInt16)(lastAltitude - altitude);
-            lastAltitude = altitude;
+            if (altitude - lastAltitude > 0)
+            {
+                SessionTotal_ascent += (UInt16)(altitude - lastAltitude);
+                LapTotal_ascent += (UInt16)(altitude - lastAltitude);
+            }
+            if (lastAltitude - altitude > 0)
+            {
+                SessionTotal_descent += (UInt16)(lastAltitude - altitude);
+                LapTotal_descent += (UInt16)(lastAltitude - altitude);
+            }
 
-            if (startTimestamp == 0) startTimestamp = timestamp;
-            if (speed > 2000)
+            if (speed > 0 && !LapEnd && !SessionEnd)
             {
                 if (speed > max_speed) max_speed = speed;
-                TravelEndTimestamp = timestamp;
-                TravelEndMeters = distance;
-                if (TravelStartMeters == 0)
+                if (SessionTravelStartCM == 0)
                 {
-                    TravelStartTimestamp = TravelEndTimestamp;
-                    TravelStartMeters = TravelEndMeters;
+                    SessionTravelStartTimestamp = timestamp;
+                    SessionTravelStartCM = distance;
+                }
+                if (LapTravelStartCM == 0)
+                {
+                    LapTravelStartTimestamp = timestamp;
+                    LapTravelStartCM = distance;
                 }
             }
             else
             {
-                TraveltotalSeconds += TravelEndTimestamp - TravelStartTimestamp;
-                TraveltotalCentimeters += TravelEndMeters - TravelStartMeters;
-                TravelStartTimestamp = TravelEndTimestamp = 0;
-                TravelStartMeters = TravelEndMeters = 0;
+                if (SessionTravelStartCM != 0)
+                {
+                    SessionTravelTotSeconds += lastTimestamp - SessionTravelStartTimestamp;
+                    SessionTravelTotcm += lastTravelCM - SessionTravelStartCM;
+                    SessionTravelStartTimestamp = 0;
+                    SessionTravelStartCM = 0;
+                }
+                if (LapTravelStartCM != 0)
+                {
+                    LapTravelTotSeconds += lastTimestamp - LapTravelStartTimestamp;
+                    LapTravelTotcm += lastTravelCM - LapTravelStartCM;
+                    LapTravelStartTimestamp = 0;
+                    LapTravelStartCM = 0;
+                }
             }
-            if (power > 0)
+            if (power > 0 && !LapEnd && !SessionEnd)
             {
                 if (power > max_power) max_power = power;
-                PowerEndTimestamp = timestamp;
-                totPower += power;
-                if (PowerStartTimestamp == 0)
-                {
-                    PowerStartTimestamp = PowerEndTimestamp;
-                }
+                SessionPowerTot += power;
+                if (SessionPowerStartTimestamp == 0)
+                    SessionPowerStartTimestamp = timestamp;
+                LapPowerTot += power;
+                if (LapPowerStartTimestamp == 0)
+                    LapPowerStartTimestamp = timestamp;
             }
             else
             {
-                PowertotalSeconds += PowerEndTimestamp - PowerStartTimestamp;
-                PowerStartTimestamp = PowerEndTimestamp = 0;
+                if (SessionPowerStartTimestamp != 0)
+                {
+                    SessionPowerTotSeconds += lastTimestamp - SessionPowerStartTimestamp;
+                    SessionPowerStartTimestamp = 0;
+                }
+                if (LapPowerStartTimestamp != 0)
+                {
+                    LapPowerTotSeconds += lastTimestamp - LapPowerStartTimestamp;
+                    LapPowerStartTimestamp = 0;
+                }
             }
-            if (heart_rate > 0)
+            if (heart_rate > 0 && !LapEnd && !SessionEnd)
             {
                 if (heart_rate > max_heart_rate) max_heart_rate = heart_rate;
-                heart_rateEndTimestamp = timestamp;
-                totheart_rate += heart_rate;
-                if (heart_rateStartTimestamp == 0)
-                {
-                    heart_rateStartTimestamp = heart_rateEndTimestamp;
-                }
+                SessionHeart_rateTot += heart_rate;
+                if (SessionHeart_rateStartTimestamp == 0)
+                    SessionHeart_rateStartTimestamp = timestamp;
+                LapHeart_rateTot += heart_rate;
+                if (SessionHeart_rateStartTimestamp == 0)
+                    SessionHeart_rateStartTimestamp = timestamp;
             }
             else
             {
-                heart_ratetotalSeconds += heart_rateEndTimestamp - heart_rateStartTimestamp;
-                heart_rateStartTimestamp = heart_rateEndTimestamp = 0;
+                if (SessionHeart_rateStartTimestamp != 0)
+                {
+                    SessionHeart_rateTotSeconds += lastTimestamp - SessionHeart_rateStartTimestamp;
+                    SessionHeart_rateStartTimestamp = 0;
+                }
+                if (LapHeart_rateStartTimestamp != 0)
+                {
+                    LapHeart_rateTotSeconds += lastTimestamp - LapHeart_rateStartTimestamp;
+                    LapHeart_rateStartTimestamp = 0;
+                }
             }
-            if (cadence > 0)
+            if (cadence > 0 && !LapEnd && !SessionEnd)
             {
                 if (cadence > max_cadence) max_cadence = cadence;
-                cadenceEndTimestamp = timestamp;
-                totcadence += cadence;
-                if (cadenceStartTimestamp == 0)
-                {
-                    cadenceStartTimestamp = cadenceEndTimestamp;
-                }
+                SessionCadenceTot += cadence;
+                if (SessionCadenceStartTimestamp == 0)
+                    SessionCadenceStartTimestamp = timestamp;
+                LapCadenceTot += cadence;
+                if (LapCadenceStartTimestamp == 0)
+                    LapCadenceStartTimestamp = timestamp;
             }
             else
             {
-                cadencetotalSeconds += cadenceEndTimestamp - cadenceStartTimestamp;
-                cadenceStartTimestamp = cadenceEndTimestamp = 0;
+                if (SessionCadenceStartTimestamp != 0)
+                {
+                    SessionCadenceTotSeconds += lastTimestamp - SessionCadenceStartTimestamp;
+                    SessionCadenceStartTimestamp = 0;
+                }
+                if (SessionCadenceStartTimestamp != 0)
+                {
+                    SessionCadenceTotSeconds += lastTimestamp - SessionCadenceStartTimestamp;
+                    SessionCadenceStartTimestamp = 0;
+                }
             }
+            lastAltitude = altitude;
+            lastTravelCM = distance;
+            lastTimestamp = timestamp;
         }
     }
     public class fitFileWrite
     {
+        const byte HEADERSIZE = 12;
         localMsgDef[] localMesgDefs = new localMsgDef[16];
         FitFieldStream fitstream;
         statistics st = new statistics();
@@ -149,7 +272,7 @@ namespace myFit
 
             MemoryStream memStream = new MemoryStream();
             fitstream = new FitFieldStream(memStream);
-            memStream.Seek(12, SeekOrigin.Begin);
+            memStream.Seek(HEADERSIZE, SeekOrigin.Begin);
             while (!file.EndOfStream)
             {
                 string[] str = file.ReadLine().Split(';');
@@ -158,9 +281,9 @@ namespace myFit
                 if (str[0] == "def")
                     writeDefintion(str);
             }
-            int size = (int)memStream.Position - 12;
+            int size = (int)memStream.Position - HEADERSIZE;
             memStream.Seek(0, SeekOrigin.Begin);
-            writeFitHeader(size);
+            writeFitHeader(size, HEADERSIZE);
             UInt16 crc = 0;
             memStream.Seek(0, SeekOrigin.Begin);
             while (memStream.Position < memStream.Length)
@@ -179,15 +302,19 @@ namespace myFit
             byte fields = localMesgDefs[header].Fields;
             localField[] fd = localMesgDefs[header].localFields;
             int globalMesgIndex = localMesgDefs[header].globalMesgIndex;
+            if (globalMesgIndex == FIT.FIT_MESG_NUM_SESSION) st.calcSession();
+            if (globalMesgIndex == FIT.FIT_MESG_NUM_LAP) st.calcLap();
             for (int i = 0; i < fields; i++)
             {
                 fitstream.writeValue(fd[i], str[i + 2], st, globalMesgIndex);
             }
-            st.update();
+            if (globalMesgIndex == FIT.FIT_MESG_NUM_RECORD) st.update();
+            if (globalMesgIndex == FIT.FIT_MESG_NUM_SESSION) st.resetSession();
+            if (globalMesgIndex == FIT.FIT_MESG_NUM_LAP) st.resetLap();
         }
-        private void writeFitHeader(Int32 size)
+        private void writeFitHeader(Int32 size, byte headerSize)
         {
-            fitstream.writeValue((byte)0x0C); //size header
+            fitstream.writeValue((byte)headerSize); //size header
             fitstream.writeValue((byte)0x10); //protocol version
             fitstream.writeValue((byte)0x40); //protocol version
             fitstream.writeValue((byte)0x00); //protocol version
@@ -262,9 +389,9 @@ namespace myFit
                 }
                 if (globalMesgIndex == FIT.FIT_MESG_NUM_SESSION)
                 {
-                    st.calcSession();
                     switch (fieldName)
                     {
+                        case "start_time": writeValue(st.SessionStartTimestamp, arch); return;
                         case "start_position_lat": writeValue(st.start_position_lat, arch); return;
                         case "start_position_long": writeValue(st.start_position_long, arch); return;
                         case "total_elapsed_time": writeValue(st.total_elapsed_time, arch); return;
@@ -279,8 +406,31 @@ namespace myFit
                         case "max_cadence": writeValue(st.max_cadence); return;
                         case "avg_power": writeValue(st.avg_power, arch); return;
                         case "max_power": writeValue(st.max_power, arch); return;
-                        case "total_ascent": writeValue((UInt16)(st.total_ascent / 5.0), arch); return;
-                        case "total_descent": writeValue((UInt16)(st.total_descent / 5.0), arch); return;
+                        case "total_ascent": writeValue((UInt16)(st.SessionTotal_ascent / 5.0), arch); return;
+                        case "total_descent": writeValue((UInt16)(st.SessionTotal_descent / 5.0), arch); return;
+                    }
+                }
+                if (globalMesgIndex == FIT.FIT_MESG_NUM_LAP)
+                {
+                    switch (fieldName)
+                    {
+                        case "start_time": writeValue(st.LapStartTimestamp, arch); return;
+                        case "start_position_lat": writeValue(st.start_position_lat, arch); return;
+                        case "start_position_long": writeValue(st.start_position_long, arch); return;
+                        case "total_elapsed_time": writeValue(st.total_elapsed_time, arch); return;
+                        case "total_timer_time": writeValue(st.total_timer_time, arch); return;
+                        case "total_distance": writeValue(st.total_distance, arch); return;
+                        case "total_calories": writeValue(st.total_calories, arch); return;
+                        case "avg_speed": writeValue(st.avg_speed, arch); return;
+                        case "max_speed": writeValue(st.max_speed, arch); return;
+                        case "avg_heart_rate": writeValue(st.avg_heart_rate); return;
+                        case "max_heart_rate": writeValue(st.max_heart_rate); return;
+                        case "avg_cadence": writeValue(st.avg_cadence); return;
+                        case "max_cadence": writeValue(st.max_cadence); return;
+                        case "avg_power": writeValue(st.avg_power, arch); return;
+                        case "max_power": writeValue(st.max_power, arch); return;
+                        case "total_ascent": writeValue((UInt16)(st.LapTotal_ascent / 5.0), arch); return;
+                        case "total_descent": writeValue((UInt16)(st.LapTotal_descent / 5.0), arch); return;
                     }
                 }
 

@@ -131,6 +131,10 @@ namespace myFit
     {
         public static DateTime dt1989 = new DateTime(1989, 12, 31, 0, 0, 0, DateTimeKind.Utc);
         public static CultureInfo cuNL = new CultureInfo("nl-NL");
+        public static string timestampToLocalTime(UInt32 UNCTimestamp)
+        {
+            return dt1989.AddSeconds(UNCTimestamp).ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss");
+        }
         enum EVENT_TYPE
         {
             START = 0,
@@ -349,7 +353,7 @@ namespace myFit
             foreach (MESG msg in mesgs)
                 if (msg.num == GlobalMsgIndex)
                     return msg;
-            return new MESG(null, "Unknown", 0, 0);
+            return new MESG(unknownFields, "Unknown", 0, 0);
         }
 
         public const int FIT_MESG_NUM_FILE_ID = 0;
@@ -445,6 +449,10 @@ namespace myFit
            new SUBFIELD(eventDataDistanceDurationAlertMaps, "distance_duration_alert", "m", 100, 0, 1, 134),
            new SUBFIELD(eventDataCalorieDurationAlertMaps, "calorie_duration_alert", "calories", 1, 0, 1, 134),
            new SUBFIELD(eventDataFitnessEquipmentStateMaps, "fitness_equipment_state", "", 1, 0, 1, 0)
+        };
+        static public globalField[] unknownFields = {
+           new globalField( null, null, "message_index", "", 1, 0, 0, 0, 254, 132 ),
+           new globalField( null, null, "timestamp", "s", 1, 0, 0, 0, 253, 134, 2678400)
         };
         static SUBFIELD_MAP[] fileIdProductGarminProductMaps ={ 
             new SUBFIELD_MAP( 1, 1 ), // manufacturer == garmin
